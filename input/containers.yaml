@@ -1,7 +1,7 @@
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterInput
 metadata:
-  name: containers
+  name: kubernetes
   labels:
     fluentbit.fluent.io/enabled: "true"
     fluentbit.fluent.io/component: logging
@@ -11,7 +11,7 @@ spec:
     path: /var/log/containers/*.log
     parser: docker
     refreshIntervalSeconds: 10
-    memBufLimit: 50MB
+    memBufLimit: 5MB
     skipLongLines: true
     db: /fluent-bit/tail/containers.db
     dbSync: Normal
@@ -20,7 +20,7 @@ spec:
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterFilter
 metadata:
-  name: containers
+  name: kubernetes
   labels:
     fluentbit.fluent.io/enabled: "true"
     fluentbit.fluent.io/component: logging
