@@ -1,9 +1,29 @@
 apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterInput
+metadata:
+  name: containers
+  labels:
+    fluentbit.fluent.io/enabled: "true"
+    fluentbit.fluent.io/component: logging
+spec:
+  tail:
+    tag: kube.*
+    path: /var/log/containers/*.log
+    parser: docker
+    refreshIntervalSeconds: 10
+    memBufLimit: 50MB
+    skipLongLines: true
+    db: /fluent-bit/tail/containers.db
+    dbSync: Normal
+
+---
+apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterFilter
 metadata:
   name: containers
   labels:
     fluentbit.fluent.io/enabled: "true"
+    fluentbit.fluent.io/component: logging
 spec:
   match: kube.*
   filters:
