@@ -1,0 +1,34 @@
+apiVersion: fluentd.fluent.io/v1alpha1
+kind: ClusterFluentdConfig
+metadata:
+  name: demo1
+  labels:
+    config.fluentd.fluent.io/enabled: "true"
+spec:
+  watchedNamespaces:
+    - demo1-dev
+    - demo1-uat
+  clusterOutputSelector:
+    matchLabels:
+      output.fluentd.fluent.io/enabled: "true"
+      output.fluentd.fluent.io/scope: "demo1"
+  clusterFilterSelector:
+    matchLabels:
+      output.fluentd.fluent.io/enabled: "true"
+      output.fluentd.fluent.io/scope: "demo1"
+
+---
+apiVersion: fluentd.fluent.io/v1alpha1
+kind: ClusterOutput
+metadata:
+  name: demo1
+  labels:
+    output.fluentd.fluent.io/enabled: "true"
+    output.fluentd.fluent.io/scope: "demo1"
+spec:
+  outputs:
+    - elasticsearch:
+        host: 172.16.3.13
+        port: 9200
+        logstashFormat: true
+        logstashPrefix: demo1
