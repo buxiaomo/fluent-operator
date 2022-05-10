@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: demo3-dev
+  name: demo3-sit
 
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: nginx
-  namespace: demo3-dev
+  namespace: demo3-sit
 data:
   nginx.conf: |-
     user  nginx nginx;
@@ -106,7 +106,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nginx
-  namespace: demo3-dev
+  namespace: demo3-sit
   labels:
     app: nginx
 spec:
@@ -123,7 +123,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx
-  namespace: demo3-dev
+  namespace: demo3-sit
   labels:
     app: nginx
 spec:
@@ -137,7 +137,7 @@ spec:
     spec:
       nodeSelector:
         project: "demo3"
-        demo3/uat: "true"
+        demo3/sit: "true"
       volumes:
         - name: nginx
           configMap:
@@ -159,7 +159,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: curl
-  namespace: demo3-dev
+  namespace: demo3-sit
   labels:
     app: curl
 spec:
@@ -173,7 +173,7 @@ spec:
     spec:
       nodeSelector:
         project: "demo3"
-        demo3/uat: "true"
+        demo3/sit: "true"
       containers:
         - name: curl
           image: buxiaomo/curl:7.80.0

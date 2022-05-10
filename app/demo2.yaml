@@ -137,7 +137,7 @@ spec:
     spec:
       nodeSelector:
         project: "demo2"
-        demo2/uat: "true"
+        demo2/dev: "true"
       volumes:
         - name: nginx
           configMap:
@@ -173,7 +173,7 @@ spec:
     spec:
       nodeSelector:
         project: "demo2"
-        demo2/uat: "true"
+        demo2/dev: "true"
       containers:
         - name: curl
           image: buxiaomo/curl:7.80.0
