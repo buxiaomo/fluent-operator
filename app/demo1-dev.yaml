@@ -1,0 +1,211 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo1-dev
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx
+  namespace: demo1-dev
+data:
+  nginx.conf: |-
+    user  nginx nginx;
+    worker_processes auto;
+    error_log  /var/log/nginx/error.log warn;
+    pid /var/run/nginx.pid;
+    worker_rlimit_nofile 51200;
+    events {
+        use epoll;
+        worker_connections 51200;
+        multi_accept off;
+        accept_mutex off;
+    }
+
+    http {
+        include /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+
+        log_format main '{"@timestamp": "$time_iso8601",'
+                        '"site": "$server_name",'
+                        '"server": "$host",'
+                        '"dest_port": $server_port,'
+                        '"dest_ip": "$server_addr",'
+                        '"src": "$remote_addr",'
+                        '"src_ip": "$realip_remote_addr",'
+                        '"user": "$remote_user",'
+                        '"protocol": "$server_protocol",'
+                        '"status": $status,'
+                        '"bytes_out": $bytes_sent,'
+                        '"bytes_in": "$upstream_bytes_received",'
+                        '"http_referer": "$http_referer",'
+                        '"http_user_agent": "$http_user_agent",'
+                        '"nginx_version": "$nginx_version",'
+                        '"http_x_forwarded_for": "$http_x_forwarded_for",'
+                        '"http_x_header": "$http_x_header",'
+                        '"uri_query": "$query_string",'
+                        '"uri_path": "$uri",'
+                        '"http_method": "$request_method",'
+                        '"response_time": "$upstream_response_time",'
+                        '"cookie": "$http_cookie",'
+                        '"request": "$request",'
+                        '"request_body": "$request_body",'
+                        '"request_time": $request_time}';
+
+        access_log /var/log/nginx/access.log main;
+
+        server_names_hash_bucket_size 128;
+        client_header_buffer_size 32k;
+        large_client_header_buffers 4 32k;
+        client_max_body_size 50m;
+
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+        ssl_prefer_server_ciphers on;
+
+        sendfile   on;
+        tcp_nopush on;
+        sendfile_max_chunk 512k;
+        tcp_nodelay on;
+
+        keepalive_timeout 60;
+
+        types_hash_max_size 2048;
+
+        fastcgi_connect_timeout 300;
+        fastcgi_send_timeout 300;
+        fastcgi_read_timeout 300;
+        fastcgi_buffer_size 64k;
+        fastcgi_buffers 4 64k;
+        fastcgi_busy_buffers_size 128k;
+        fastcgi_temp_file_write_size 256k;
+
+        gzip on;
+        gzip_min_length  1k;
+        gzip_buffers     4 16k;
+        gzip_http_version 1.1;
+        gzip_comp_level 2;
+        gzip_types     text/plain application/javascript application/x-javascript text/javascript text/css application/xml application/xml+rss;
+        gzip_vary on;
+        gzip_proxied   expired no-cache no-store private auth;
+        gzip_disable   "MSIE [1-6]\.";
+
+        server_tokens off;
+
+        server {
+          listen 80 default_server reuseport;
+          server_name _;
+          index index.html index.htm index.php;
+          default_type text/html;
+          return 404  "No server is currently configured for the requested host.\n";
+        }
+    }
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: demo1-dev
+  labels:
+    app: nginx
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: nginx
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: demo1-dev
+  labels:
+    app: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      nodeSelector:
+        project: "demo1"
+        demo1/dev: "true"
+      volumes:
+        - name: nginx
+          configMap:
+            defaultMode: 0755
+            name: nginx
+      containers:
+        - name: nginx
+          image: docker.io/buxiaomo/nginx:1.17.9-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: curl
+  namespace: demo1-dev
+  labels:
+    app: curl
+spec:
+  selector:
+    matchLabels:
+      app: curl
+  template:
+    metadata:
+      labels:
+        app: curl
+    spec:
+      nodeSelector:
+        project: "demo1"
+        demo1/dev: "true"
+      containers:
+        - name: curl
+          image: buxiaomo/curl:7.80.0
+          args:
+            - "-n"
+            - "1"
+            - "curl"
+            - "http://nginx"
+            - "-o"
+            - "/dev/null"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: debuglog
+  namespace: demo1-dev
+  labels:
+    app: debuglog
+    log.output.name: demo1-dev-nginx
+spec:
+  selector:
+    matchLabels:
+      app: debuglog
+  template:
+    metadata:
+      labels:
+        app: debuglog
+    spec:
+      nodeSelector:
+        project: "demo1"
+        demo1/dev: "true"
+      containers:
+        - name: debuglog
+          image: docker.io/buxiaomo/log:1.0
