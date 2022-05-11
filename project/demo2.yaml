@@ -12,10 +12,47 @@ spec:
     matchLabels:
       output.fluentd.fluent.io/enabled: "true"
       output.fluentd.fluent.io/scope: "demo2-noprod"
+
+---
+apiVersion: fluentd.fluent.io/v1alpha1
+kind: ClusterFluentdConfig
+metadata:
+  name: demo2-noprod-nginx
+  labels:
+    config.fluentd.fluent.io/enabled: "true"
+spec:
+  watchedNamespaces:
+    - demo2-dev
+  watchedConstainers:
+    - nginx
+  clusterOutputSelector:
+    matchLabels:
+      output.fluentd.fluent.io/enabled: "true"
+      output.fluentd.fluent.io/scope: "demo2-noprod"
   clusterFilterSelector:
     matchLabels:
       output.fluentd.fluent.io/enabled: "true"
       output.fluentd.fluent.io/scope: "demo3-noprod-nginx"
+
+---
+apiVersion: fluentd.fluent.io/v1alpha1
+kind: ClusterFilter
+metadata:
+  name: demo3-noprod-nginx
+  labels:
+    output.fluentd.fluent.io/enabled: "true"
+    output.fluentd.fluent.io/scope: "demo3-noprod-nginx"
+spec:
+  filters:
+    - recordTransformer:
+        records:
+          - key: server
+            value: none
+    - recordTransformer:
+        records:
+          - key: version
+            value: ${record["nginx_version"]}
+        removeKeys: nginx_version
 
 ---
 apiVersion: fluentd.fluent.io/v1alpha1
@@ -33,33 +70,3 @@ spec:
         logstashFormat: true
         logstashPrefix: demo2-noprod
 
----
-apiVersion: fluentd.fluent.io/v1alpha1
-kind: ClusterFluentdConfig
-metadata:
-  name: demo2-prod
-  labels:
-    config.fluentd.fluent.io/enabled: "true"
-spec:
-  watchedNamespaces:
-    - demo2-prod
-  clusterOutputSelector:
-    matchLabels:
-      output.fluentd.fluent.io/enabled: "true"
-      output.fluentd.fluent.io/scope: "demo2-prod"
-
----
-apiVersion: fluentd.fluent.io/v1alpha1
-kind: ClusterOutput
-metadata:
-  name: demo2-prod
-  labels:
-    output.fluentd.fluent.io/enabled: "true"
-    output.fluentd.fluent.io/scope: "demo2-prod"
-spec:
-  outputs:
-    - elasticsearch:
-        host: 172.16.3.13
-        port: 9200
-        logstashFormat: true
-        logstashPrefix: demo2-prod
