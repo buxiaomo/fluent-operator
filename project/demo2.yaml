@@ -2,61 +2,64 @@
 apiVersion: fluentd.fluent.io/v1alpha1
 kind: ClusterFluentdConfig
 metadata:
-  name: demo1-noprod
+  name: demo2-noprod
   labels:
     config.fluentd.fluent.io/enabled: "true"
 spec:
   watchedNamespaces:
-    - demo1-dev
-    - demo1-uat
+    - demo2-dev
   clusterOutputSelector:
     matchLabels:
       output.fluentd.fluent.io/enabled: "true"
-      output.fluentd.fluent.io/scope: "demo1-noprod"
+      output.fluentd.fluent.io/scope: "demo2-noprod"
+  clusterFilterSelector:
+    matchLabels:
+      output.fluentd.fluent.io/enabled: "true"
+      output.fluentd.fluent.io/scope: "demo3-noprod-nginx"
 
 ---
 apiVersion: fluentd.fluent.io/v1alpha1
 kind: ClusterOutput
 metadata:
-  name: demo1-noprod
+  name: demo2-noprod
   labels:
     output.fluentd.fluent.io/enabled: "true"
-    output.fluentd.fluent.io/scope: "demo1-noprod"
+    output.fluentd.fluent.io/scope: "demo2-noprod"
 spec:
   outputs:
     - elasticsearch:
         host: 172.16.3.13
         port: 9200
         logstashFormat: true
-        logstashPrefix: demo1-noprod
+        logstashPrefix: demo2-noprod
 
 ---
 apiVersion: fluentd.fluent.io/v1alpha1
 kind: ClusterFluentdConfig
 metadata:
-  name: demo1-prod
+  name: demo2-prod
   labels:
     config.fluentd.fluent.io/enabled: "true"
 spec:
   watchedNamespaces:
-    - demo1-prod
+    - demo2-prod
   clusterOutputSelector:
     matchLabels:
       output.fluentd.fluent.io/enabled: "true"
-      output.fluentd.fluent.io/scope: "demo1-prod"
+      output.fluentd.fluent.io/scope: "demo2-prod"
 
 ---
 apiVersion: fluentd.fluent.io/v1alpha1
 kind: ClusterOutput
 metadata:
-  name: demo1-prod
+  name: demo2-prod
   labels:
     output.fluentd.fluent.io/enabled: "true"
-    output.fluentd.fluent.io/scope: "demo1-prod"
+    output.fluentd.fluent.io/scope: "demo2-prod"
 spec:
   outputs:
     - elasticsearch:
         host: 172.16.3.13
         port: 9200
         logstashFormat: true
-        logstashPrefix: demo1-prod
+        logstashPrefix: demo2-prod
