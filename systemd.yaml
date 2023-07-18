@@ -1,0 +1,57 @@
+---
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterInput
+metadata:
+  name: kube-component
+  labels:
+    fluentbit.fluent.io/infra: "true"
+spec:
+  systemd:
+    tag: k8s-component.*
+    path: /var/log/journal
+    db: /fluent-bit/kube-component.db
+    dbSync: Normal
+    systemdFilter:
+      - _SYSTEMD_UNIT=kube-apiserver.service
+      - _SYSTEMD_UNIT=kube-scheduler.service
+      - _SYSTEMD_UNIT=kube-controller-manager.service
+      - _SYSTEMD_UNIT=kube-proxy.service
+      - _SYSTEMD_UNIT=kubelet.service
+      - _SYSTEMD_UNIT=etcd.service
+
+---
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterFilter
+metadata:
+  name: kube-component
+  labels:
+    fluentbit.fluent.io/infra: "true"
+spec:
+  match: k8s-component.*
+  filters:
+
+    - parser:
+        reserveData: true
+        keyName: MESSAGE
+        parser: json
+
+    - modify:
+        rules:
+          - rename: {"ts": "@timestamp"}
+          - rename: {"msg": "message"}
+
+---
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterOutput
+metadata:
+  name: kube-component
+  labels:
+    fluentbit.fluent.io/infra: "true"
+spec:
+  matchRegex: k8s-component.*
+  es:
+    host: 172.16.0.146
+    port: 9200
+    logstashPrefix: kube-component
+    logstashFormat: true
+

@@ -1,0 +1,68 @@
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: FluentBit
+metadata:
+  name: infra
+  namespace: infra
+  labels:
+    app.kubernetes.io/name: infra
+spec:
+  image: kubesphere/fluent-bit:v2.1.4
+  positionDB:
+    hostPath:
+      path: /var/lib/fluent-bit/
+  resources:
+    requests:
+      cpu: 10m
+      memory: 25Mi
+    limits:
+      cpu: 1
+      memory: 1Gi
+  fluentBitConfigName: infra
+  tolerations:
+    - operator: Exists
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 5
+    tcpSocket:
+      port: 2020
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 5
+    tcpSocket:
+      port: 2020
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-role.kubernetes.io/edge
+            operator: DoesNotExist
+
+---
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterFluentBitConfig
+metadata:
+  name: infra
+  labels:
+    app.kubernetes.io/name: infra
+spec:
+  service:
+    logLevel: info
+    parsersFile: parsers.conf
+    httpListen: 0.0.0.0
+    httpPort: 2020
+    httpServer: true
+  inputSelector:
+    matchLabels:
+      fluentbit.fluent.io/infra: "true"
+  filterSelector:
+    matchLabels:
+      fluentbit.fluent.io/infra: "true"
+  outputSelector:
+    matchLabels:
+      fluentbit.fluent.io/infra: "true"
+  parserSelector:
+    matchLabels:
+      fluentbit.fluent.io/infra: "true"

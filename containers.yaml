@@ -1,0 +1,75 @@
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterInput
+metadata:
+  name: containers
+  labels:
+    fluentbit.fluent.io/infra: "true"
+spec:
+  tail:
+    tag: kube.*
+    path: /var/log/containers/*.log
+    parser: cri
+    refreshIntervalSeconds: 10
+    memBufLimit: 100MB
+    skipLongLines: true
+    db: /fluent-bit/tail/containers.db
+    dbSync: Normal
+
+---
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterFilter
+metadata:
+  name: containers
+  labels:
+    fluentbit.fluent.io/infra: "true"
+spec:
+  matchRegex: kube.*
+  filters:
+    - kubernetes:
+        # kubeTagPrefix: kube.var.log.containers.
+        kubeURL: https://kubernetes.default.svc:443
+        kubeCAFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        kubeTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+        labels: true
+        annotations: true
+        mergeLog: true
+        k8sLoggingExclude: true
+        k8sLoggingParser: true
+        keepLog: false
+        mergeLogTrim: true
+
+    - nest:
+        operation: lift
+        nestedUnder: kubernetes
+        addPrefix: kubernetes_
+
+    - modify:
+        rules:
+          - remove: stream
+          - remove: kubernetes_pod_id
+          - remove: kubernetes_container_hash
+
+    - nest:
+        operation: nest
+        wildcard:
+          - kubernetes_*
+        nestUnder: kubernetes
+        removePrefix: kubernetes_
+
+---
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterOutput
+metadata:
+  name: containers
+  labels:
+    fluentbit.fluent.io/infra: "true"
+spec:
+  matchRegex: kube.*
+  es:
+    host: 172.16.0.146
+    port: 9200
+    logstashPrefix: kube-containers
+    logstashFormat: true
+    traceError: true
+    replaceDots: true
+    bufferSize: 512M

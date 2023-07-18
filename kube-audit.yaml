@@ -1,0 +1,52 @@
+---
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterInput
+metadata:
+  name: kube-audit
+  labels:
+    fluentbit.fluent.io/infra: "true"
+spec:
+  tail:
+    tag: k8s-audit.*
+    path: /var/log/kubernetes/audit.log
+    refreshIntervalSeconds: 10
+    memBufLimit: 5MB
+    db: /fluent-bit/k8s-audit.db
+    dbSync: Normal
+
+---
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterFilter
+metadata:
+  name: kube-audit
+  labels:
+    fluentbit.fluent.io/infra: "true"
+spec:
+  match: k8s-audit.*
+  filters:
+    - parser:
+        keyName: log
+        parser: json
+
+    - recordModifier:
+        records:
+          - clusterName demo1
+
+    - modify:
+        rules:
+          - rename: {"requestReceivedTimestamp": "@timestamp"}
+---
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterOutput
+metadata:
+  name: kube-audit
+  labels:
+    fluentbit.fluent.io/infra: "true"
+spec:
+  matchRegex: k8s-audit.*
+  es:
+    host: 172.16.0.146
+    port: 9200
+    logstashPrefix: kube-audit
+    logstashFormat: true
+    timeKey: "@timestamp"
