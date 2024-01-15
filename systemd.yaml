@@ -2,14 +2,14 @@
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterInput
 metadata:
-  name: devops_kube_system
+  name: devops-kube-system
   labels:
     fluentbit.fluent.io/infra: "true"
 spec:
   systemd:
-    tag: devops_kube_system.*
+    tag: devops-kube-system.*
     path: /var/log/journal
-    db: /fluent-bit/kube-component.db
+    db: /fluent-bit/devops-kube-system.db
     dbSync: Normal
     systemdFilter:
       - _SYSTEMD_UNIT=kube-apiserver.service
@@ -28,11 +28,11 @@ spec:
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterFilter
 metadata:
-  name: devops_kube_system
+  name: devops-kube-system
   labels:
     fluentbit.fluent.io/infra: "true"
 spec:
-  match: devops_kube_system.*
+  match: devops-kube-system.*
   filters:
 
     - parser:
@@ -49,7 +49,7 @@ spec:
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterOutput
 metadata:
-  name: devops_kube_system
+  name: devops-kube-system
   labels:
     fluentbit.fluent.io/infra: "true"
 spec:
