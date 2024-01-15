@@ -40,7 +40,7 @@ data:
       timeStr["hour"], timeStr["min"], timeStr["sec"],
       timestamp["nsec"])
 
-      new_record["time"] = t
+      new_record["@timestamp"] = t
       new_record["log"] = record["MESSAGE"]
 
       return 1, timestamp, new_record
