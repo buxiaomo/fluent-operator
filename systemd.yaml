@@ -2,12 +2,12 @@
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterInput
 metadata:
-  name: kube-component
+  name: devops_kube_system
   labels:
     fluentbit.fluent.io/infra: "true"
 spec:
   systemd:
-    tag: k8s-component.*
+    tag: devops_kube_system.*
     path: /var/log/journal
     db: /fluent-bit/kube-component.db
     dbSync: Normal
@@ -28,11 +28,11 @@ spec:
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterFilter
 metadata:
-  name: kube-component
+  name: devops_kube_system
   labels:
     fluentbit.fluent.io/infra: "true"
 spec:
-  match: k8s-component.*
+  match: devops_kube_system.*
   filters:
 
     - parser:
@@ -49,14 +49,14 @@ spec:
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterOutput
 metadata:
-  name: kube-component
+  name: devops_kube_system
   labels:
     fluentbit.fluent.io/infra: "true"
 spec:
-  matchRegex: k8s-component.*
+  matchRegex: devops_kube_system.*
   es:
     host: 172.16.0.146
     port: 9200
-    logstashPrefix: kube-component
+    logstashPrefix: devops_kube_system
     logstashFormat: true
 
