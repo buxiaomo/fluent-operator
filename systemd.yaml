@@ -41,7 +41,18 @@ data:
       timestamp["nsec"])
 
       new_record["@timestamp"] = t
-      new_record["log"] = record["MESSAGE"]
+      new_record["cmdline"] = record["_CMDLINE"]
+      new_record["systemd_unit"] = record["_SYSTEMD_UNIT"]
+      new_record["systemd_slice"] = record["_SYSTEMD_SLICE"]
+      new_record["systemd_cgroup"] = record["_SYSTEMD_CGROUP"]
+      new_record["hostname"] = record["_HOSTNAME"]
+      new_record["pid"] = record["_PID"]
+      new_record["stream_id"] = record["STREAM_ID"]
+      new_record["transport"] = record["_TRANSPORT"]
+      new_record["priority"] = record["PRIORITY"]
+      new_record["uid"] = record["_UID"]
+      new_record["selinux_context"] = record["_SELINUX_CONTEXT"]
+      new_record["message"] = record["MESSAGE"]
 
       return 1, timestamp, new_record
     end
@@ -65,7 +76,7 @@ spec:
 
     - parser:
         reserveData: true
-        keyName: log
+        keyName: message
         parser: json
 
 ---
