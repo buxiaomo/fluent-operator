@@ -65,6 +65,11 @@ spec:
         call: add_time
         timeAsTable: true
 
+    # - parser:
+    #     reserveData: true
+    #     keyName: message
+    #     parser: json
+
 ---
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterOutput
