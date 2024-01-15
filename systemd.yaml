@@ -11,6 +11,9 @@ spec:
     path: /var/log/journal
     db: /fluent-bit/devops-kube-system.db
     dbSync: Normal
+    storageType: memory
+    pauseOnChunksOverlimit: "off"
+    stripUnderscores: "off"
     systemdFilter:
       - _SYSTEMD_UNIT=kube-apiserver.service
       - _SYSTEMD_UNIT=kube-scheduler.service
