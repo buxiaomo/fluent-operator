@@ -15,8 +15,8 @@ spec:
       cpu: 10m
       memory: 25Mi
     limits:
-      cpu: 1
-      memory: 1Gi
+      cpu: 2
+      memory: 2Gi
   fluentBitConfigName: infra
   tolerations:
     - operator: Exists
