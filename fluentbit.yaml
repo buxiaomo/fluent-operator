@@ -49,7 +49,7 @@ metadata:
     app.kubernetes.io/name: infra
 spec:
   service:
-    logLevel: info
+    logLevel: error
     parsersFile: parsers.conf
     httpListen: 0.0.0.0
     httpPort: 2020
