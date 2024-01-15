@@ -2,27 +2,27 @@
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterInput
 metadata:
-  name: devops_kube_audit
+  name: devops-kube-audit
   labels:
     fluentbit.fluent.io/infra: "true"
 spec:
   tail:
-    tag: devops_kube_audit.*
+    tag: devops-kube-audit.*
     path: /var/log/kubernetes/audit.log
     refreshIntervalSeconds: 10
     memBufLimit: 500MB
-    db: /fluent-bit/devops_kube_audit.db
+    db: /fluent-bit/devops-kube-audit.db
     dbSync: Normal
 
 ---
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterFilter
 metadata:
-  name: devops_kube_audit
+  name: devops-kube-audit
   labels:
     fluentbit.fluent.io/infra: "true"
 spec:
-  match: devops_kube_audit.*
+  match: devops-kube-audit.*
   filters:
     - parser:
         keyName: log
@@ -39,11 +39,11 @@ spec:
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterOutput
 metadata:
-  name: devops_kube_audit
+  name: devops-kube-audit
   labels:
     fluentbit.fluent.io/infra: "true"
 spec:
-  matchRegex: devops_kube_audit.*
+  matchRegex: devops-kube-audit.*
   es:
     host: 172.16.0.146
     port: 9200
