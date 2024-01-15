@@ -65,9 +65,8 @@ spec:
 
     - parser:
         reserveData: true
-        keyName: MESSAGE
+        keyName: log
         parser: json
-
 
 ---
 apiVersion: fluentbit.fluent.io/v1alpha2
