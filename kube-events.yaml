@@ -22,8 +22,8 @@ data:
         elasticsearch:
           hosts:
             - "http://172.16.0.146:9200"
-          index: kube-events
-          indexFormat: "kube-events-{2006.01.02}"
+          index: devops_kube_event
+          indexFormat: "devops_kube_event-{2006.01.02}"
 ---
 # Source: kubernetes-event-exporter/templates/role.yaml
 apiVersion: rbac.authorization.k8s.io/v1
