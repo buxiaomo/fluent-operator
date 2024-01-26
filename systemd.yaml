@@ -80,8 +80,10 @@ metadata:
 spec:
   matchRegex: devops-kube-system.*
   es:
-    host: 172.16.0.146
+    host: 172.16.100.10
+    index: devops_kube_sys-%Y.%m.%d
     port: 9200
-    logstashPrefix: devops_kube_sys
-    logstashFormat: true
-
+    replaceDots: true
+    suppressTypeName: "false"
+    traceError: true
+    type: _doc
