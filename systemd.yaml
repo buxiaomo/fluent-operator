@@ -65,6 +65,10 @@ spec:
         call: add_time
         timeAsTable: true
 
+    - recordModifier:
+        records:
+          - clusterName demo1
+
     # - parser:
     #     reserveData: true
     #     keyName: message
