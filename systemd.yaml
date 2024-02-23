@@ -2,14 +2,14 @@
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterInput
 metadata:
-  name: devops-kube-system
+  name: devops-kube-component
   labels:
     fluentbit.fluent.io/infra: "true"
 spec:
   systemd:
-    tag: devops-kube-system.*
+    tag: devops-kube-component.*
     path: /var/log/journal
-    db: /fluent-bit/devops-kube-system.db
+    db: /fluent-bit/devops-kube-component.db
     dbSync: Normal
     storageType: memory
     pauseOnChunksOverlimit: "off"
@@ -31,7 +31,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: devops-kube-system
+  name: devops-kube-component
 data:
   systemd.lua: |
     function add_time(tag, timestamp, record)
@@ -52,16 +52,16 @@ data:
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterFilter
 metadata:
-  name: devops-kube-system
+  name: devops-kube-component
   labels:
     fluentbit.fluent.io/infra: "true"
 spec:
-  match: devops-kube-system.*
+  match: devops-kube-component.*
   filters:
     - lua:
         script:
           key: systemd.lua
-          name: devops-kube-system
+          name: devops-kube-component
         call: add_time
         timeAsTable: true
 
@@ -74,14 +74,14 @@ spec:
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterOutput
 metadata:
-  name: devops-kube-system
+  name: devops-kube-component
   labels:
     fluentbit.fluent.io/infra: "true"
 spec:
-  matchRegex: devops-kube-system.*
+  matchRegex: devops-kube-component.*
   es:
     host: 172.16.100.10
-    index: devops_kube_sys-%Y.%m.%d
+    index: devops-kube-component-%Y.%m.%d
     port: 9200
     replaceDots: true
     suppressTypeName: "false"
