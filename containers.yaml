@@ -59,7 +59,7 @@ spec:
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterOutput
 metadata:
-  name: containers
+  name: containers-kube-syste
   labels:
     fluentbit.fluent.io/infra: "true"
 spec:
@@ -78,7 +78,7 @@ spec:
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterOutput
 metadata:
-  name: containers
+  name: containers-infra
   labels:
     fluentbit.fluent.io/infra: "true"
 spec:
