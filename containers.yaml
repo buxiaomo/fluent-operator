@@ -26,7 +26,6 @@ spec:
   matchRegex: kube.*
   filters:
     - kubernetes:
-        # kubeTagPrefix: kube.var.log.containers.
         kubeURL: https://kubernetes.default.svc:443
         kubeCAFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         kubeTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -64,10 +63,29 @@ metadata:
   labels:
     fluentbit.fluent.io/infra: "true"
 spec:
-  matchRegex: kube.*
+  matchRegex: kube.var.log.containers.*_kube-system_.*-(\w|\.){68}$
   es:
     host: 172.16.100.10
-    index: kube-containers-%Y.%m.%d
+    index: devops-applog-kube-system-%Y.%m.%d
+    port: 9200
+    replaceDots: true
+    suppressTypeName: "false"
+    traceError: true
+    type: _doc
+    bufferSize: 10M
+
+---
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterOutput
+metadata:
+  name: containers
+  labels:
+    fluentbit.fluent.io/infra: "true"
+spec:
+  matchRegex: kube.var.log.containers.*_infra_.*-(\w|\.){68}$
+  es:
+    host: 172.16.100.10
+    index: devops-applog-infra-%Y.%m.%d
     port: 9200
     replaceDots: true
     suppressTypeName: "false"
