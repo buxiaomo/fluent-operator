@@ -55,6 +55,10 @@ spec:
         nestUnder: kubernetes
         removePrefix: kubernetes_
 
+    - recordModifier:
+        records:
+          - clusterName demo1
+
 ---
 apiVersion: fluentbit.fluent.io/v1alpha2
 kind: ClusterOutput
