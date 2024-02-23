@@ -21,9 +21,9 @@ data:
       - name: "dump"
         elasticsearch:
           hosts:
-            - "http://172.16.0.146:9200"
-          index: devops_kube_event
-          indexFormat: "devops_kube_event-{2006.01.02}"
+            - "http://172.16.100.10:9200"
+          index: devops-kube-event
+          indexFormat: "devops-kube-event-{2006.01.02}"
 ---
 # Source: kubernetes-event-exporter/templates/role.yaml
 apiVersion: rbac.authorization.k8s.io/v1
