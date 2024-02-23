@@ -8,6 +8,7 @@ spec:
   tail:
     tag: kube.*
     path: /var/log/containers/*.log
+    # path: "/var/log/containers/[^\/]+_kube-system_[^\/]+[a-f0-9]{64}\.log"
     parser: cri
     refreshIntervalSeconds: 10
     memBufLimit: 100MB
