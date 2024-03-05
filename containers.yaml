@@ -97,4 +97,22 @@ spec:
     traceError: true
     type: _doc
     bufferSize: 10M
-    
+
+---
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterOutput
+metadata:
+  name: containers-dubhe-system
+  labels:
+    fluentbit.fluent.io/infra: "true"
+spec:
+  matchRegex: kube.var.log.containers.*_dubhe-system_.*-(\w|\.){68}$
+  es:
+    host: 172.16.100.10
+    index: devops-applog-dubhe-%Y.%m.%d
+    port: 9200
+    replaceDots: true
+    suppressTypeName: "false"
+    traceError: true
+    type: _doc
+    bufferSize: 10M
