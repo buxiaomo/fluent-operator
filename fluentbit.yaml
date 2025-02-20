@@ -6,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: infra
 spec:
-  image: kubesphere/fluent-bit:v2.2.0
+  image: ghcr.io/fluent/fluent-operator/fluent-bit:3.2.5
   positionDB:
     hostPath:
       path: /var/lib/fluent-bit/
